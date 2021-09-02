@@ -44,6 +44,11 @@ def build_parser():
     parser.add_argument(
         "--protmodel", type=str, required=True, help="Path to latent-to-protein model"
     )
+    parser.add_argument(
+        "--nofilter",
+        action="store_true",
+        help="Whether or not to perform filtering (only applies with --data argument)",
+    )
     input_group = parser.add_mutually_exclusive_group(required=True)
     input_group.add_argument("--atac", type=str, nargs="*", help="Input ATAC")
     input_group.add_argument("--rna", type=str, nargs="*", help="Input RNA")
@@ -93,7 +98,11 @@ def main():
             _rna_genes,
             _marker_genes,
             _housekeeper_genes,
-        ) = load_rna_files_for_eval(args.rna, checkpoint=args.babel, no_filter=True)
+        ) = load_rna_files_for_eval(
+            args.rna,
+            checkpoint=args.babel,
+            no_filter=args.nofilter
+        )
         sc_atac_dummy_dset = sc_data_loaders.DummyDataset(
             shape=len(atac_bins), length=len(sc_rna_dset)
         )

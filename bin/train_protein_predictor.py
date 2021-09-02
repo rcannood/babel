@@ -130,6 +130,11 @@ def build_parser():
         help="file containing raw protein counts",
     )
     parser.add_argument(
+        "--nofilter",
+        action="store_true",
+        help="Whether or not to perform filtering (only applies with --data argument)",
+    )
+    parser.add_argument(
         "--encoder", required=True, type=str, help="Model folder to find encoder"
     )
     parser.add_argument(
@@ -218,6 +223,10 @@ def main():
     rna_data_kwargs["reader"] = lambda x: load_rna_files(
         x, args.encoder, transpose=not args.notrans
     )
+    if args.nofilter:
+        rna_data_kwargs = {
+            k: v for k, v in rna_data_kwargs.items() if not k.startswith("filt_")
+        }
 
     # Construct data folds
     full_sc_rna_dataset = sc_data_loaders.SingleCellDataset(
